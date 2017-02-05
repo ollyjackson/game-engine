@@ -1,0 +1,125 @@
+<html>
+<head>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery.hotkeys.js"></script>
+<script src="raphael-min.js"></script>
+<script type="text/javascript">
+var map = [
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 1, 1, 1, 1, 0, 0, 1],
+[1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+[1, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+[1, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+];
+
+var minimappaper;
+
+var gameengine = {
+  playermarker: null,
+  current_index: 0,
+  playerx: 10,
+  playery: 10,
+  running: true,
+  init: function(element)
+  {
+    console.log('game initialised');
+
+    jQuery(document).bind('keydown', 'left',function (evt){
+      gameengine.playerMove(-10, null);
+    });
+
+    jQuery(document).bind('keydown', 'right',function (evt){
+      gameengine.playerMove(10, null);
+    });
+
+    jQuery(document).bind('keydown', 'up',function (evt){
+      gameengine.playerMove(null, -10);
+    });
+
+    jQuery(document).bind('keydown', 'down',function (evt){
+      gameengine.playerMove(null, 10);
+    });
+
+    gameengine.drawminimap();
+
+    setInterval("gameengine.tick()",100);
+  },
+  drawminimap: function()
+  {
+    /*canvasdom = document.getElementById('minimap');
+    ctx = canvasdom.getContext('2d');
+
+    ctx.fillStyle = 'rgba(0,0,0, 1)';*/
+
+    for (var i=0; i < 10; i++) {
+      for (var j=0; j < 10; j++) {
+        if (map[j][i] == 1)  {
+          minimappaper.rect((i*10),(j*10),10,10).attr({fill: "#000"});
+        }
+      }
+    }
+
+    gameengine.playermarker = minimappaper.rect(gameengine.playerx, gameengine.playery, 10, 10).attr({fill: "#FF0000"});
+
+  },
+  tick: function()
+  {
+    gameengine.updateScores();
+
+    gameengine.updatePlayerPosition();
+  },
+  updatePlayerPosition: function()
+  {
+    //console.log('updating player position');
+
+    gameengine.playermarker.animate({x: gameengine.playerx, y: gameengine.playery}, 100);
+
+  },
+  updateScores: function()
+  {
+
+  },
+  playerMove: function(x, y)
+  {
+    if (x !== null) {
+      if (map[Math.floor(gameengine.playery/10)][Math.floor((gameengine.playerx + x)/10)] != 1) {
+        gameengine.playerx += x;
+      }
+    }
+    if (y !== null) {
+      if (map[Math.floor((gameengine.playery + y)/10)][Math.floor(gameengine.playerx/10)] != 1) {
+        gameengine.playery += y;
+      }
+    }
+  }
+};
+
+$(function(){
+  minimappaper = Raphael("minimap", 320, 200)
+  gameengine.init($('#gamecanvas'));
+});
+</script>
+<style type="text/css">
+#gamecanvas {
+  background-color: #000;
+  height: 500px;
+  float: left;
+  width: 500px;
+}
+#minimap {
+  float: left;
+  height: 100px;
+  width: 100px;
+}
+</style>
+</head>
+<body>
+<canvas id="gamecanvas"></canvas>
+<div id="minimap" height="500" width="500"></div>
+</body>
+</html>
